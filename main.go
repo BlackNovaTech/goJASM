@@ -8,16 +8,29 @@ import (
 	"git.practool.xyz/nova/goJASM/opconf"
 	"github.com/op/go-logging"
 	"os"
+	"flag"
 )
 
 var log *logging.Logger
+var logInfo bool
+var logDebug bool
 
 func init() {
+	flag.BoolVar(&logInfo, "info", false, "enable info message logging (default false)")
+	flag.BoolVar(&logDebug, "debug", false, "enable debug message logging (default false)")
+	flag.Parse()
+
 	log = logging.MustGetLogger("main")
 	format := logging.MustStringFormatter(`%{module:10.10s} [%{color}%{level:.4s}%{color:reset}] %{message}`)
 	logging.SetFormatter(format)
 	logging.SetBackend(logging.NewLogBackend(os.Stdout, "", 0))
-	logging.SetLevel(logging.NOTICE, "")
+	if logDebug {
+		logging.SetLevel(logging.DEBUG, "")
+	} else if logInfo {
+		logging.SetLevel(logging.INFO, "")
+	} else {
+		logging.SetLevel(logging.NOTICE, "")
+	}
 }
 
 func main() {

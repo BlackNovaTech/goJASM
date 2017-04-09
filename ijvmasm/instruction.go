@@ -41,7 +41,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 	var bytes uint32 = 1
 
 	for i, token := range params {
-		log.Infof("%d -> %s", i, token)
+		log.Debugf("arg %d -> %s", i, token)
 		switch op.Args[i] {
 		case opconf.ArgByte:
 			val, err := parsers.ParseInt8(token)

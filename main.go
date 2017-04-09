@@ -8,6 +8,7 @@ import (
 	flag "github.com/spf13/pflag"
 	"strings"
 	"path"
+	"io"
 )
 
 var log *logging.Logger
@@ -29,7 +30,7 @@ func init() {
 	log = logging.MustGetLogger("main")
 	format := logging.MustStringFormatter(`%{module:10.10s} [%{color}%{level:.4s}%{color:reset}] %{message}`)
 	logging.SetFormatter(format)
-	logging.SetBackend(logging.NewLogBackend(os.Stdout, "", 0))
+	logging.SetBackend(logging.NewLogBackend(os.Stderr, "", 0))
 	if flagDebug {
 		logging.SetLevel(logging.DEBUG, "")
 	} else if flagInfo {
@@ -73,13 +74,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	out, err := os.Create(output)
-	if err != nil {
-		log.Critical("Could not open outputFile file:")
-		log.Critical(err.Error())
-		os.Exit(1)
+	log.Notice(output)
+	var out io.Writer = os.Stdout
+	if output != "-" {
+		outf, err := os.Create(output)
+		if err != nil {
+			log.Critical("Could not open outputFile file:")
+			log.Critical(err.Error())
+			os.Exit(1)
+		}
+		defer outf.Close()
+		out = outf
 	}
-	defer out.Close()
+
 
 	err = asm.Generate(out)
 	if err != nil {

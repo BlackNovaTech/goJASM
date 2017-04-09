@@ -1,0 +1,20 @@
+image: golang:1.8
+
+stages:
+  - build
+
+.binaries: &binaries
+  stage: build
+  script:
+  - export platforms=$(echo $CI_JOB_NAME | sed 's|binaries ||')
+  - mkdir -p $GOPATH/src/git.practool.xyz/nova
+  - ln -s $(pwd) $GOPATH/src/git.practool.xyz/nova/goJASM
+  - cd $GOPATH/src/git.practool.xyz/nova/goJASM
+  - gox $(platforms) -output="out/ijvmasm-{{.OS}}-{{.Arch}}"
+  artifacts:
+    paths:
+    - out/
+
+binaries darwin/386 darwin/amd64: *binaries
+binaries linux/386 linux/amd64 linux/arm: *binaries
+binaries windows/386 windows/amd64: *binaries

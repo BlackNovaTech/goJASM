@@ -6,11 +6,12 @@ stages:
 .binaries: &binaries
   stage: build
   script:
-  - export platforms=$(echo $CI_JOB_NAME | sed 's|binaries ||')
+  - export PLATFORMS=$(echo $CI_JOB_NAME | sed 's|binaries ||')
   - mkdir -p $GOPATH/src/git.practool.xyz/nova
   - ln -s $(pwd) $GOPATH/src/git.practool.xyz/nova/goJASM
   - cd $GOPATH/src/git.practool.xyz/nova/goJASM
-  - gox $(platforms) -output="out/ijvmasm-{{.OS}}-{{.Arch}}"
+  - go get github.com/mitchellh/gox
+  - gox $(PLATFORMS) -output="out/ijvmasm-{{.OS}}-{{.Arch}}"
   artifacts:
     paths:
     - out/

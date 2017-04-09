@@ -74,7 +74,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Notice(output)
 	var out io.Writer = os.Stdout
 	if output != "-" {
 		outf, err := os.Create(output)
@@ -92,5 +91,4 @@ func main() {
 	if err != nil {
 		log.Error(err.Error())
 	}
-	log.Notice("Assembly complete")
 }

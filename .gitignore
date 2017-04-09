@@ -20,3 +20,4 @@
 *.jas
 vendor/
 *.conf
+goJASM

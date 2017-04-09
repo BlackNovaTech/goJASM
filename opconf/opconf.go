@@ -9,6 +9,7 @@ import (
 	"git.practool.xyz/nova/goJASM/parsers"
 	"errors"
 	"path"
+	"io"
 )
 
 var log = logging.MustGetLogger("opconf")
@@ -37,17 +38,29 @@ type Operation struct {
 	Args []ArgType
 }
 
-func NewOpConfig(filepath string) *OpConfig {
+func NewOpConfigFromPath(filepath string) *OpConfig {
 	file, err := os.Open(filepath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	scanner := bufio.NewScanner(file)
+	config := NewOpConfig(file, path.Base(filepath))
+
+	return config
+}
+
+func NewDefaultOpConfig() *OpConfig {
+	config := NewOpConfig(strings.NewReader(DefaultConfig), "default")
+
+	return config
+}
+
+func NewOpConfig(read io.Reader, name string) *OpConfig {
+	scanner := bufio.NewScanner(read)
 
 	config := &OpConfig{
-		fileName:   path.Base(filepath),
 		scanner:    scanner,
+		fileName:   name,
 		operations: make(map[string]*Operation),
 	}
 

@@ -147,6 +147,7 @@ func (asm *Assembler) mainBlock() {
 		return
 	}
 	asm.methodBlock("main")
+	asm.parsedMain = true
 }
 
 func (asm *Assembler) methodBlock(name string) {
@@ -298,10 +299,10 @@ func (asm *Assembler) Panicf(format string, args ...interface{}) {
 
 func (asm *Assembler) skipUntil(pattern string) {
 	for token := asm.next(); token != nil; token = asm.next() {
+		log.Warning(asm.Sprintf("|skip| %s", token.Text))
 		if token.Text == pattern {
 			return
 		}
-		log.Warning(asm.Sprintf("|skip| %s", token.Text))
 	}
 }
 

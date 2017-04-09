@@ -19,3 +19,4 @@
 *.ijvm
 *.jas
 vendor/
+*.conf

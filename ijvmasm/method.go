@@ -1,12 +1,14 @@
 package ijvmasm
 
 import (
-	"strings"
 	"errors"
-	"git.practool.xyz/nova/goJASM/opconf"
 	"io"
+	"strings"
+
+	"git.practool.xyz/nova/goJASM/opconf"
 )
 
+// Method represents a single IJVM method context
 type Method struct {
 	name         string
 	vars         []string
@@ -14,20 +16,24 @@ type Method struct {
 	labels       []*Label
 	end          string
 
-	bytes        uint32
-	numparam     int
+	bytes    uint32
+	numparam int
 
 	N uint32
 
 	wide bool
 }
 
+// Label represents a single label in JAS.
+// Is used to calculate GOTO and friends' offsets
 type Label struct {
 	Name string
 	N    uint32
 	B    uint32
 }
 
+// NewMethod returns a new Method based on the given method declaration and line number.
+// Parameters are parsed from the string and added to the parameter list.
 func NewMethod(nameParam string, N uint32) (*Method, error) {
 	end := JASMethodEnd
 	params := []string{}
@@ -48,7 +54,6 @@ func NewMethod(nameParam string, N uint32) (*Method, error) {
 			return nil, errors.New("Invalid method declaration. Characters remaining after parameter list")
 		}
 
-
 		paramlst := strings.Split(paramstr, ",")
 		// BS empty parameter list
 		if paramstr == "" {
@@ -65,7 +70,7 @@ func NewMethod(nameParam string, N uint32) (*Method, error) {
 	return &Method{
 		name:         name,
 		vars:         params,
-		numparam: len(params),
+		numparam:     len(params),
 		instructions: make([]*Instruction, 0),
 		labels:       make([]*Label, 0),
 		end:          end,
@@ -74,10 +79,13 @@ func NewMethod(nameParam string, N uint32) (*Method, error) {
 
 }
 
+// AppendInst appends a single instruction to the instruction stream.
 func (m *Method) AppendInst(inst *Instruction) {
 	m.instructions = append(m.instructions, inst)
 }
 
+// VarIndex fetches the variable index of the given variable name.
+// Returns ok iff variable is found.
 func (m *Method) VarIndex(str string) (int, bool) {
 	for i, p := range m.vars {
 		if p == str {
@@ -87,6 +95,7 @@ func (m *Method) VarIndex(str string) (int, bool) {
 	return -1, false
 }
 
+// Finds label for linking
 func (m *Method) findLabel(name string) (bool, int, *Label) {
 	for i, label := range m.labels {
 		if label.Name == name {
@@ -96,6 +105,8 @@ func (m *Method) findLabel(name string) (bool, int, *Label) {
 	return false, -1, nil
 }
 
+// LinkLabels iterates over the instruction stream and replaces every GOTO&friends label with the correct
+// offset.
 func (m *Method) LinkLabels() (ok bool) {
 	ok = true
 	for _, inst := range m.instructions {
@@ -118,6 +129,8 @@ func (m *Method) LinkLabels() (ok bool) {
 	return
 }
 
+// LinkMethods iterates over the instruction stream and replaces every INVOKEVIRTUAL&friends method argument with the correct
+// constant index.
 func (m *Method) LinkMethods(asm *Assembler) (ok bool) {
 	ok = true
 	for _, inst := range m.instructions {
@@ -133,12 +146,14 @@ func (m *Method) LinkMethods(asm *Assembler) (ok bool) {
 				}
 				inst.params[j] = idx
 				log.Debugf("[.%s] Linking method, line %d: %s -> %d",
-					m.name, inst.N, mtd.Name, inst.params[j])			}
+					m.name, inst.N, mtd.Name, inst.params[j])
+			}
 		}
 	}
 	return
 }
 
+// Generate the Method's corresponding IJVM binary code
 func (m *Method) Generate(out io.Writer) {
 	for _, inst := range m.instructions {
 		mustWrite(out, inst.op.Opcode)

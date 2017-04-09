@@ -1,6 +1,7 @@
 package opconf
 
-const DefaultConfig = `0x10    BIPUSH byte
+// Default operation configuration
+const defaultConfig = `0x10    BIPUSH byte
 0x59    DUP
 0xA7    GOTO label
 0x60    IADD

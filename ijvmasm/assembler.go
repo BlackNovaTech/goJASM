@@ -2,19 +2,22 @@ package ijvmasm
 
 import (
 	"bufio"
-	"github.com/op/go-logging"
-	"os"
-	"strings"
-	"fmt"
-	"git.practool.xyz/nova/goJASM/opconf"
 	"errors"
-	"git.practool.xyz/nova/goJASM/parsers"
+	"fmt"
+	"os"
 	"path"
 	"regexp"
+	"strings"
+
+	"git.practool.xyz/nova/goJASM/opconf"
+	"git.practool.xyz/nova/goJASM/parsers"
+	"github.com/op/go-logging"
 )
 
 var log = logging.MustGetLogger("ijvmasm")
 
+// Assembler represents the main state of the assembler, housing all internal
+// information related to assembling a single IJVM program.
 type Assembler struct {
 	opconf *opconf.OpConfig
 
@@ -30,9 +33,11 @@ type Assembler struct {
 	parsedMain  bool
 	parsedConst bool
 
-	Failed bool
+	failed bool
 }
 
+// NewAssembler returns a new Assembler object with the given
+// filepath as input program, and given operator configuration.
 func NewAssembler(filepath string, ops *opconf.OpConfig) *Assembler {
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -55,18 +60,23 @@ func splitLink(s, sep string) (string, string) {
 	return x[0], x[1]
 }
 
+// Line represents a single line in an IJVM program.
 type Line struct {
 	Text string
 	N    uint32
 }
 
+// Constant represents a single IJVM constant.
 type Constant struct {
 	Name  string
 	Value int32
 	N     uint32
 }
 
-func (asm *Assembler) Parse() (err error) {
+// Parse parses the Assembler's loaded IJVM program into an internal representation.
+// Returns ok iff the parsing was successful.
+// Returns an error iff an unignorable error is triggered and parsing has to terminate prematurely.
+func (asm *Assembler) Parse() (ok bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			switch x := r.(type) {
@@ -78,6 +88,7 @@ func (asm *Assembler) Parse() (err error) {
 				err = errors.New("Unknown assembly failure")
 			}
 		}
+		ok = asm.failed
 	}()
 	for token := asm.next(); token != nil; token = asm.next() {
 		log.Debug(asm.Sprintf(token.Text))
@@ -101,9 +112,11 @@ func (asm *Assembler) Parse() (err error) {
 		}
 	}
 	asm.linkMethods()
+	ok = asm.failed
 	return
 }
 
+// Parses an IJVM constant block
 func (asm *Assembler) constantBlock() {
 	if asm.parsedConst {
 		asm.Errorf("Constant block was already declared")
@@ -140,6 +153,7 @@ func (asm *Assembler) constantBlock() {
 	asm.Panicf("Unexpected end of file\n")
 }
 
+// Parses a main block
 func (asm *Assembler) mainBlock() {
 	if asm.parsedMain {
 		asm.Errorf("Main was already declared. Skipping...")
@@ -150,6 +164,7 @@ func (asm *Assembler) mainBlock() {
 	asm.parsedMain = true
 }
 
+// Parses a method block
 func (asm *Assembler) methodBlock(name string) {
 	log.Infof("[.%s] Entering method", name)
 	method, err := NewMethod(name, asm.line)
@@ -207,6 +222,7 @@ func (asm *Assembler) methodBlock(name string) {
 	asm.Panicf("Unexpected end of file\n")
 }
 
+// Parses a var block
 func (asm *Assembler) parseVars(method *Method) {
 	for token := asm.next(); token != nil; token = asm.next() {
 		log.Debug(asm.Sprintf(token.Text))
@@ -234,7 +250,8 @@ func (asm *Assembler) parseVars(method *Method) {
 	return // Unreachable anyway
 }
 
-func (asm *Assembler) readConstant(line *Line) (*Constant) {
+// Read a single constant
+func (asm *Assembler) readConstant(line *Line) *Constant {
 	parts := strings.Fields(line.Text)
 	if len(parts) < 2 {
 		asm.Errorf("constant: Missing constant value")
@@ -261,6 +278,7 @@ func (asm *Assembler) readConstant(line *Line) (*Constant) {
 
 }
 
+// Find a constant in the assemblers constant pool
 func (asm *Assembler) findConstant(name string) (bool, int, *Constant) {
 	for index, constant := range asm.constants {
 		if constant.Name == name {
@@ -270,9 +288,10 @@ func (asm *Assembler) findConstant(name string) (bool, int, *Constant) {
 	return false, -1, nil
 }
 
+// Get the next token from the scanner, nil if no tokens are remaining.
 func (asm *Assembler) next() *Line {
 	if asm.scanner.Scan() {
-		asm.line += 1
+		asm.line++
 		return &Line{
 			N:    asm.line,
 			Text: strings.TrimSpace(strings.SplitN(asm.scanner.Text(), "//", 2)[0]),
@@ -281,22 +300,28 @@ func (asm *Assembler) next() *Line {
 	return nil
 }
 
+// Sprintf formats given arguments, but prepends filename and line number.
 func (asm *Assembler) Sprintf(format string, args ...interface{}) string {
 	vars := append([]interface{}{asm.fileName, asm.line}, args...)
 
 	return fmt.Sprintf("%s:%d > "+format, vars...)
 }
 
+// Errorf sets the failed flag of the assembler, and then logs an error
+// using Assembler#Sprintf
 func (asm *Assembler) Errorf(format string, args ...interface{}) {
-	asm.Failed = true
+	asm.failed = true
 	log.Errorf(asm.Sprintf(format, args...))
 }
 
+// Panicf sets the failed flag of the assembler, and panics an error
+// using Assembler#Sprintf
 func (asm *Assembler) Panicf(format string, args ...interface{}) {
-	asm.Failed = true
+	asm.failed = true
 	panic(errors.New(asm.Sprintf(format, args...)))
 }
 
+// Skips lines until given string
 func (asm *Assembler) skipUntil(pattern string) {
 	for token := asm.next(); token != nil; token = asm.next() {
 		log.Warning(asm.Sprintf("|skip| %s", token.Text))
@@ -306,6 +331,8 @@ func (asm *Assembler) skipUntil(pattern string) {
 	}
 }
 
+// Generate constants for each method and set the parameter of all instructions
+// that need it.
 func (asm *Assembler) linkMethods() (ok bool) {
 	ok = true
 	if len(asm.methods) == 0 {

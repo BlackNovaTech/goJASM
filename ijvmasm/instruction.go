@@ -2,10 +2,12 @@ package ijvmasm
 
 import (
 	"strings"
+
 	"git.practool.xyz/nova/goJASM/opconf"
 	"git.practool.xyz/nova/goJASM/parsers"
 )
 
+// Instruction is a single instruction in the instruction stream.
 type Instruction struct {
 	op     *opconf.Operation
 	params []int
@@ -18,6 +20,7 @@ type Instruction struct {
 	linkMethod bool
 }
 
+// Parses a single instruction string for the given method
 func (asm *Assembler) parseInstruction(method *Method, instr string) {
 	tokens := strings.Fields(instr)
 	opname := tokens[0]
@@ -50,7 +53,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 				return
 			}
 			instruction.params[i] = int(val)
-			bytes += 1
+			bytes++
 		case opconf.ArgVar:
 			idx, ok := method.VarIndex(token)
 			if !ok {
@@ -58,9 +61,9 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 				return
 			}
 			instruction.params[i] = idx
-			bytes += 1
+			bytes++
 			if instruction.wide {
-				bytes += 1
+				bytes++
 			}
 		case opconf.ArgLabel:
 			instruction.label = token
@@ -88,6 +91,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 	log.Infof("[.%s] Registered instruction: %s (%d)", method.name, instruction.op.Name, len(instruction.params))
 }
 
+// NewInstruction creates a new Instruction based on the given Operation, line number, and byte number.
 func NewInstruction(op *opconf.Operation, N, B uint32) *Instruction {
 	return &Instruction{
 		op:     op,

@@ -1,18 +1,21 @@
 package ijvmasm
 
 import (
-	"io"
 	"encoding/binary"
 	"errors"
+	"io"
 )
 
 var (
-	// Magic header, yay
+	// Magic header for the IJVM binaries
 	Magic = uint32(0x1DEADFAD)
-	// Byte offset of constant pool stolen from mic1
+	// ConstPoolOffset is the byte offset of the constant pool.
+	// Stolen from Mic1 emulator
 	ConstPoolOffset = uint32(0x10000)
 )
 
+// Generate IJVM binary code from the parsed JAS file.
+// Returns error iff any write fails.
 func (asm *Assembler) Generate(out io.Writer) (err error) {
 	defer func() {
 		if r := recover(); r != nil {

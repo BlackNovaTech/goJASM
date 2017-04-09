@@ -88,7 +88,7 @@ func (asm *Assembler) Parse() (ok bool, err error) {
 				err = errors.New("Unknown assembly failure")
 			}
 		}
-		ok = asm.failed
+		ok = !asm.failed
 	}()
 	for token := asm.next(); token != nil; token = asm.next() {
 		log.Debug(asm.Sprintf(token.Text))
@@ -112,7 +112,7 @@ func (asm *Assembler) Parse() (ok bool, err error) {
 		}
 	}
 	asm.linkMethods()
-	ok = asm.failed
+	ok = !asm.failed
 	return
 }
 

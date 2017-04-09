@@ -1,6 +1,8 @@
-hash: 99024ae1f4a5d168183836f85459345ff75fdf70078b3fa252c9684e6e009fe4
-updated: 2017-04-09T14:18:55.318250193+02:00
+hash: f457b339d4c7ea8bb229f933750166ce519ad6906916f98ad357d6c3903ca837
+updated: 2017-04-09T15:10:55.472276086+02:00
 imports:
 - name: github.com/op/go-logging
   version: b2cb9fa56473e98db8caba80237377e83fe44db5
+- name: github.com/spf13/pflag
+  version: 9a906f17374922ed0f74e1b2f593d3723f2ffb00
 testImports: []

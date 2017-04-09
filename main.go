@@ -5,7 +5,7 @@ import (
 	"git.practool.xyz/nova/goJASM/opconf"
 	"github.com/op/go-logging"
 	"os"
-	"flag"
+	flag "github.com/spf13/pflag"
 	"strings"
 	"path"
 )
@@ -18,11 +18,11 @@ var flagOutput string
 var flagForce bool
 
 func init() {
-	flag.BoolVar(&flagInfo, "info", false, "enable info message logging (default false)")
-	flag.BoolVar(&flagDebug, "debug", false, "enable debug message logging (default false)")
-	flag.StringVar(&flagConfig, "config", "", "specify custom ijvm configuration file")
-	flag.StringVar(&flagOutput, "output", "", "specify output file. (default ./{filename}.ijvm)")
-	flag.BoolVar(&flagForce, "force", false, "ignore most error messages and just yolo through (default false)")
+	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging (default false)")
+	flag.BoolVarP(&flagDebug, "debug", "d", false, "enable debug message logging (default false)")
+	flag.StringVarP(&flagConfig, "config", "c" ,"", "specify custom ijvm configuration file")
+	flag.StringVarP(&flagOutput, "output", "o", "", "specify output file. (default ./{filename}.ijvm)")
+	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through (default false)")
 
 	flag.Parse()
 

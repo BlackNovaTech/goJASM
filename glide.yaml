@@ -1,0 +1,4 @@
+package: git.practool.xyz/nova/goJASM
+import:
+- package: github.com/op/go-logging
+  version: ^1.0.0

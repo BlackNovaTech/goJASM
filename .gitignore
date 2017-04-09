@@ -18,3 +18,4 @@
 ## JAS/IJVM files
 *.ijvm
 *.jas
+vendor/

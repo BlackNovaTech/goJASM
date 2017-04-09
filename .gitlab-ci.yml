@@ -1,4 +1,4 @@
-image: golang:1.8
+image: golang
 
 stages:
   - build
@@ -10,11 +10,15 @@ stages:
   - mkdir -p $GOPATH/src/git.practool.xyz/nova
   - ln -s $(pwd) $GOPATH/src/git.practool.xyz/nova/goJASM
   - cd $GOPATH/src/git.practool.xyz/nova/goJASM
+  - go get github.com/Masterminds/glide
+  - glide install
   - go get github.com/mitchellh/gox
-  - gox $(PLATFORMS) -output="out/ijvmasm-{{.OS}}-{{.Arch}}"
+  - gox -osarch="$PLATFORMS" -output="out/ijvmasm-{{.OS}}-{{.Arch}}"
   artifacts:
     paths:
     - out/
+  tags:
+    - k8s
 
 binaries darwin/386 darwin/amd64: *binaries
 binaries linux/386 linux/amd64 linux/arm: *binaries

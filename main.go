@@ -10,6 +10,7 @@ import (
 	"git.practool.xyz/nova/goJASM/opconf"
 	"github.com/op/go-logging"
 	flag "github.com/spf13/pflag"
+	"fmt"
 )
 
 var log *logging.Logger
@@ -18,6 +19,7 @@ var flagDebug bool
 var flagConfig string
 var flagOutput string
 var flagForce bool
+var flagAutoWide bool
 
 func init() {
 	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging (default false)")
@@ -25,6 +27,12 @@ func init() {
 	flag.StringVarP(&flagConfig, "config", "c", "", "specify custom ijvm configuration file")
 	flag.StringVarP(&flagOutput, "output", "o", "", "specify output file. (default ./{filename}.ijvm)")
 	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through (default false)")
+	flag.BoolVarP(&flagAutoWide, "widen", "w", false, "automatically add WIDE operations when required (default false)")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s inputfile\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 
@@ -40,6 +48,8 @@ func init() {
 		logging.SetLevel(logging.NOTICE, "")
 	}
 }
+
+
 
 func main() {
 	args := flag.Args()
@@ -62,6 +72,7 @@ func main() {
 	}
 
 	asm := ijvmasm.NewAssembler(input, config)
+	asm.AutoWide = flagAutoWide
 	ok, err := asm.Parse()
 
 	if err != nil && !flagForce {

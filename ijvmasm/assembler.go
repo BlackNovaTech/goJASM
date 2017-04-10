@@ -21,6 +21,9 @@ var log = logging.MustGetLogger("ijvmasm")
 type Assembler struct {
 	opconf *opconf.OpConfig
 
+	// AutoWide flags the assembler to insert WIDE instructions whenever required
+	AutoWide bool
+
 	fileName string
 	scanner  *bufio.Scanner
 	line     uint32

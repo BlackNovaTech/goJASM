@@ -38,7 +38,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 
 	instruction := NewInstruction(op, asm.line, method.bytes)
 	if method.wide {
-		log.Infof("[.%s] Operation widened", method.name)
+		log.Infof("[.%s] Operation widened", method.name, )
 		instruction.wide = true
 		method.wide = false
 	}
@@ -65,6 +65,17 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 			bytes++
 			if instruction.wide {
 				bytes++
+			} else if idx > 0xFF {
+				if asm.AutoWide {
+					method.AppendInst(NewInstruction(asm.opconf.GetOp(OperationWide), asm.line, method.bytes))
+					bytes++
+					instruction.B++
+					instruction.wide = true
+					log.Infof("[.%s] Auto widened instruction", method.name)
+				} else {
+					asm.Errorf("argument: Variable index out of range: `%s` (%d > %d)", token, idx, 0xFF)
+					return
+				}
 			}
 		case opconf.ArgLabel:
 			instruction.label = token

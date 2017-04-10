@@ -3,8 +3,6 @@ package main
 import (
 	"io"
 	"os"
-	"path"
-	"strings"
 
 	"git.practool.xyz/nova/goJASM/ijvmasm"
 	"git.practool.xyz/nova/goJASM/opconf"
@@ -22,12 +20,12 @@ var flagForce bool
 var flagAutoWide bool
 
 func init() {
-	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging (default false)")
-	flag.BoolVarP(&flagDebug, "debug", "d", false, "enable debug message logging (default false)")
+	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging")
+	flag.BoolVarP(&flagDebug, "debug", "d", false, "enable debug message logging")
 	flag.StringVarP(&flagConfig, "config", "c", "", "specify custom ijvm configuration file")
-	flag.StringVarP(&flagOutput, "output", "o", "", "specify output file. (default ./{filename}.ijvm)")
-	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through (default false)")
-	flag.BoolVarP(&flagAutoWide, "widen", "w", false, "automatically add WIDE operations when required (default false)")
+	flag.StringVarP(&flagOutput, "output", "o", "", "specify output file. (default out.ijvm)")
+	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through")
+	flag.BoolVarP(&flagAutoWide, "widen", "w", false, "automatically add WIDE operations when required")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s inputfile\n", os.Args[0])
@@ -50,7 +48,6 @@ func init() {
 }
 
 
-
 func main() {
 	args := flag.Args()
 	if len(args) == 0 {
@@ -68,7 +65,7 @@ func main() {
 	input := args[0]
 	output := flagOutput
 	if output == "" {
-		output = path.Base(strings.TrimSuffix(input, path.Ext(input)) + ".ijvm")
+		output = "out.ijvm"
 	}
 
 	asm := ijvmasm.NewAssembler(input, config)

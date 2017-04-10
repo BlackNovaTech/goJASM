@@ -38,6 +38,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 
 	instruction := NewInstruction(op, asm.line, method.bytes)
 	if method.wide {
+		log.Infof("[.%s] Operation widened", method.name)
 		instruction.wide = true
 		method.wide = false
 	}
@@ -89,6 +90,10 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 	method.AppendInst(instruction)
 	method.bytes += bytes
 	log.Infof("[.%s] Registered instruction: %s (%d)", method.name, instruction.op.Name, len(instruction.params))
+
+	if instruction.op.Name == OperationWide {
+		method.wide = true
+	}
 }
 
 // NewInstruction creates a new Instruction based on the given Operation, line number, and byte number.

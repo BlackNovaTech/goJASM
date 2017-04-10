@@ -120,7 +120,7 @@ func (cfg *OpConfig) parse() {
 			continue
 		}
 
-		opname := tokens[1]
+		opname := strings.ToUpper(tokens[1])
 
 		if _, ok := cfg.operations[opname]; ok {
 			cfg.Errorf("Duplicate operation `%s`", opname)

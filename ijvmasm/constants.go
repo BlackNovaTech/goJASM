@@ -10,4 +10,6 @@ const (
 	JASConstantEnd   = ".end-constant"
 	JASMethodPrefix  = ".method "
 	JASMethodEnd     = ".end-method"
+
+	OperationWide = "WIDE"
 )

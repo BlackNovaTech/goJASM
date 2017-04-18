@@ -38,7 +38,7 @@ deploy:
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - scp -Br out/ deploy@phoenix.labs.vu.nl:gojasm/
+    - scp -Br out/ deploy@phoenix.labs.vu.nl:files/gojasm/
 
 binaries darwin/386 darwin/amd64: *binaries
 binaries linux/386 linux/amd64 linux/arm: *binaries

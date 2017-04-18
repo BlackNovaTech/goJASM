@@ -30,8 +30,8 @@ lint:
 
 deploy:
   stage: deploy
-  #only:
-  #  - tags
+  only:
+   - tags
   before_script:
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$DEPLOY_KEY")

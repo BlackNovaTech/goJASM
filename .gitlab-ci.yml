@@ -17,8 +17,6 @@ lint:
   script:
     - go get github.com/golang/lint/golint
     - go list ./... | grep -v vendor | xargs -n1 golint --set_exit_status
-  tags:
-    - k8s
 
 .binaries: &binaries
   stage: build
@@ -29,8 +27,6 @@ lint:
   artifacts:
     paths:
     - out/
-  tags:
-    - k8s
 
 deploy:
   stage: deploy

@@ -3,6 +3,7 @@ image: golang
 stages:
   - lint
   - build
+  - deploy
 
 before_script:
   - mkdir -p $GOPATH/src/git.practool.xyz/nova
@@ -30,6 +31,18 @@ lint:
     - out/
   tags:
     - k8s
+
+deploy:
+  stage: deploy
+  #only:
+  #  - tags
+  before_script:
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$DEPLOY_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - scp -Br out/ deploy@phoenix.labs.vu.nl:gojasm/
 
 binaries darwin/386 darwin/amd64: *binaries
 binaries linux/386 linux/amd64 linux/arm: *binaries

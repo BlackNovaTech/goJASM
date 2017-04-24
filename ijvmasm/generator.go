@@ -4,6 +4,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+	"bytes"
+	"bufio"
+	"fmt"
 )
 
 var (
@@ -57,6 +60,59 @@ func (asm *Assembler) Generate(out io.Writer) (err error) {
 		m.Generate(out)
 	}
 
+	return
+}
+
+func (asm *Assembler) GenerateDebugSymbols(out io.Writer) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown generation failure")
+			}
+		}
+	}()
+
+
+	buf := new(bytes.Buffer)
+	writer := bufio.NewWriter(buf)
+
+	// Write method headers
+	for _, m := range asm.methods {
+		mustWrite(writer, m.B)
+		mustWrite(writer, []byte(m.name))
+		mustWrite(writer, uint8(0))
+	}
+
+	writer.Flush()
+	outbytes := buf.Bytes()
+
+	mustWrite(out, uint32(0xEEEEEEEE))
+	mustWrite(out, uint32(len(outbytes)))
+	mustWrite(out, outbytes)
+
+	buf = new(bytes.Buffer)
+	writer = bufio.NewWriter(buf)
+
+	// Write labels
+	for _, m := range asm.methods {
+		for _, l := range m.labels {
+			mustWrite(writer, m.B + l.B)
+			mustWrite(writer, []byte(fmt.Sprintf("%s#%s", m.name, l.Name)))
+			mustWrite(writer, uint8(0))
+		}
+	}
+
+	writer.Flush()
+	outbytes = buf.Bytes()
+
+	mustWrite(out, uint32(0xFFFFFFFF))
+	mustWrite(out, uint32(len(outbytes)))
+	mustWrite(out, outbytes)
 	return
 }
 

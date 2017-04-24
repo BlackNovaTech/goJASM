@@ -20,6 +20,7 @@ type Method struct {
 	numparam int
 
 	N uint32
+	B uint32
 
 	wide bool
 }

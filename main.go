@@ -18,6 +18,7 @@ var flagConfig string
 var flagOutput string
 var flagForce bool
 var flagAutoWide bool
+var flagSymbols bool
 
 func init() {
 	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging")
@@ -26,6 +27,7 @@ func init() {
 	flag.StringVarP(&flagOutput, "output", "o", "", "specify output file. (default out.ijvm)")
 	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through")
 	flag.BoolVarP(&flagAutoWide, "widen", "w", false, "automatically add WIDE operations when required")
+	flag.BoolVarP(&flagSymbols, "symbols", "s", false, "generate symbol blocks")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s inputfile\n", os.Args[0])
@@ -95,8 +97,14 @@ func main() {
 		out = outf
 	}
 
-	err = asm.Generate(out)
-	if err != nil {
+	if err = asm.Generate(out); err != nil {
 		log.Error(err.Error())
+	}
+
+	if flagSymbols {
+		log.Info("Generating Symbols...")
+		if err = asm.GenerateDebugSymbols(out); err != nil {
+			log.Error(err.Error())
+		}
 	}
 }

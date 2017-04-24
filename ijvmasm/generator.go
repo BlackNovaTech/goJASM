@@ -18,7 +18,7 @@ var (
 )
 
 // Generate IJVM binary code from the parsed JAS file.
-// Returns error iff any write fails.
+// Returns error if any write fails.
 func (asm *Assembler) Generate(out io.Writer) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -63,6 +63,12 @@ func (asm *Assembler) Generate(out io.Writer) (err error) {
 	return
 }
 
+// GenerateDebugSymbols generates two extra IJVM blocks.
+// The first block contains the methods and the second block
+// contains the labels for each method in the form 'method#label'
+// Each entry in both blocks have the following format:
+// <location:u32> <name> '\0'
+// Returns error if any write fails
 func (asm *Assembler) GenerateDebugSymbols(out io.Writer) (err error) {
 	defer func() {
 		if r := recover(); r != nil {

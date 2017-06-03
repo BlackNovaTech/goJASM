@@ -267,7 +267,16 @@ func (asm *Assembler) readConstant(line *Line) *Constant {
 		return nil
 	}
 
-	word, err := parsers.ParseInt32(strval)
+	var word int32
+	var err error
+	if strings.HasPrefix(strval, "'") {
+		a, e := parsers.ParseChar(strval)
+		word = int32(a)
+		err = e
+	} else {
+		word, err = parsers.ParseInt32(strval)
+	}
+
 	if err != nil {
 		asm.Errorf("constant: %s", err.Error())
 		return nil

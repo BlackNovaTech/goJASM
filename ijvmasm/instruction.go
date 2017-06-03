@@ -48,7 +48,13 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 		log.Debugf("arg %d -> %s", i, token)
 		switch op.Args[i] {
 		case opconf.ArgByte:
-			val, err := parsers.ParseInt8(token)
+			var val int8
+			var err error
+			if strings.HasPrefix(token, "'") {
+				val, err = parsers.ParseChar(token)
+			} else {
+				val, err = parsers.ParseInt8(token)
+			}
 			if err != nil {
 				asm.Errorf("argument: %s", err.Error())
 				return

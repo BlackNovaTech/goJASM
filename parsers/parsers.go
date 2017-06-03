@@ -3,6 +3,7 @@ package parsers
 import (
 	"fmt"
 	"math/big"
+	"strings"
 )
 
 func parseInt(strval string, bitlen int) (int64, error) {
@@ -107,4 +108,15 @@ func ParseUint64(strval string) (uint64, error) {
 		return 0, err
 	}
 	return uint64(val), nil
+}
+
+// ParseChar parses an uint8 from a character literal
+func ParseChar(strval string) (int8, error) {
+	if strings.HasPrefix(strval, "'") {
+		if !strings.HasSuffix(strval, "'") || len(strval) != 3 {
+			return 0, fmt.Errorf("Invalid character literal `%s`", strval)
+		}
+		return int8(strval[1]), nil
+	}
+	return 0, fmt.Errorf("Invalid character literal `%s`", strval)
 }

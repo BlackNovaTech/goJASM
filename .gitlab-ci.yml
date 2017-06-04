@@ -18,12 +18,11 @@ lint:
     - go get github.com/golang/lint/golint
     - go list ./... | grep -v vendor | xargs -n1 golint --set_exit_status
 
-.binaries: &binaries
+binaries:
   stage: build
   script:
-  - export PLATFORMS=$(echo $CI_JOB_NAME | sed 's|binaries ||')
   - go get github.com/mitchellh/gox
-  - gox -osarch="$PLATFORMS" -output="out/gojasm-{{.OS}}-{{.Arch}}"
+  - make cross
   artifacts:
     paths:
     - out/
@@ -39,7 +38,3 @@ deploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - scp -Br out/ deploy@phoenix.labs.vu.nl:files/gojasm/
-
-binaries darwin/386 darwin/amd64: *binaries
-binaries linux/386 linux/amd64 linux/arm: *binaries
-binaries windows/386 windows/amd64: *binaries

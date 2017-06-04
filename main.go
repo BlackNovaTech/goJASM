@@ -12,13 +12,22 @@ import (
 )
 
 var log *logging.Logger
-var flagInfo bool
-var flagDebug bool
-var flagConfig string
-var flagOutput string
-var flagForce bool
-var flagAutoWide bool
-var flagSymbols bool
+var (
+	flagInfo bool
+	flagDebug bool
+	flagConfig string
+	flagOutput string
+	flagForce bool
+	flagAutoWide bool
+	flagSymbols bool
+	flagVersion bool
+)
+
+// Linker Variables
+var (
+	Version   string
+	BuildDate string
+)
 
 func init() {
 	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging")
@@ -28,6 +37,7 @@ func init() {
 	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through")
 	flag.BoolVarP(&flagAutoWide, "widen", "w", false, "automatically add WIDE operations when required")
 	flag.BoolVarP(&flagSymbols, "symbols", "s", false, "generate symbol blocks")
+	flag.BoolVarP(&flagVersion, "version", "v", false, "output version information")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s inputfile\n", os.Args[0])
@@ -35,6 +45,11 @@ func init() {
 	}
 
 	flag.Parse()
+
+	if flagVersion {
+		printVersion()
+		os.Exit(0)
+	}
 
 	log = logging.MustGetLogger("main")
 	format := logging.MustStringFormatter(`%{module:10.10s} [%{color}%{level:.4s}%{color:reset}] %{message}`)
@@ -107,4 +122,9 @@ func main() {
 			log.Error(err.Error())
 		}
 	}
+}
+
+func printVersion() {
+	fmt.Printf("goJASM version %s\n", Version)
+	fmt.Printf("Built at: %s\n", BuildDate)
 }

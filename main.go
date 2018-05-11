@@ -4,8 +4,8 @@ import (
 	"io"
 	"os"
 
-	"git.practool.xyz/nova/goJASM/ijvmasm"
-	"git.practool.xyz/nova/goJASM/opconf"
+	"github.com/BlackNovaTech/goJASM/ijvmasm"
+	"github.com/BlackNovaTech/goJASM/opconf"
 	"github.com/op/go-logging"
 	flag "github.com/spf13/pflag"
 	"fmt"

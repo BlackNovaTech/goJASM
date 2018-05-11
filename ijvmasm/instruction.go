@@ -3,8 +3,8 @@ package ijvmasm
 import (
 	"strings"
 
-	"git.practool.xyz/nova/goJASM/opconf"
-	"git.practool.xyz/nova/goJASM/parsers"
+	"github.com/BlackNovaTech/goJASM/opconf"
+	"github.com/BlackNovaTech/goJASM/parsers"
 )
 
 // Instruction is a single instruction in the instruction stream.

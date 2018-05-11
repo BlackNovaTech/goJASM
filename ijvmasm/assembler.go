@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"strings"
 
-	"git.practool.xyz/nova/goJASM/opconf"
-	"git.practool.xyz/nova/goJASM/parsers"
+	"github.com/BlackNovaTech/goJASM/opconf"
+	"github.com/BlackNovaTech/goJASM/parsers"
 	"github.com/op/go-logging"
 )
 

@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"git.practool.xyz/nova/goJASM/parsers"
+	"github.com/BlackNovaTech/goJASM/parsers"
 	"github.com/op/go-logging"
 )
 

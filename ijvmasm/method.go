@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"git.practool.xyz/nova/goJASM/opconf"
+	"github.com/BlackNovaTech/goJASM/opconf"
 )
 
 // Method represents a single IJVM method context

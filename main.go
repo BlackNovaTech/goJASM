@@ -4,23 +4,24 @@ import (
 	"io"
 	"os"
 
+	"fmt"
+
 	"github.com/BlackNovaTech/goJASM/ijvmasm"
 	"github.com/BlackNovaTech/goJASM/opconf"
 	"github.com/op/go-logging"
 	flag "github.com/spf13/pflag"
-	"fmt"
 )
 
 var log *logging.Logger
 var (
-	flagInfo bool
-	flagDebug bool
-	flagConfig string
-	flagOutput string
-	flagForce bool
+	flagInfo     bool
+	flagDebug    bool
+	flagConfig   string
+	flagOutput   string
+	flagForce    bool
 	flagAutoWide bool
-	flagSymbols bool
-	flagVersion bool
+	flagSymbols  bool
+	flagVersion  bool
 )
 
 // Linker Variables
@@ -63,7 +64,6 @@ func init() {
 		logging.SetLevel(logging.NOTICE, "")
 	}
 }
-
 
 func main() {
 	args := flag.Args()

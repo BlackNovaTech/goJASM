@@ -1,12 +1,12 @@
 package ijvmasm
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/binary"
 	"errors"
-	"io"
-	"bytes"
-	"bufio"
 	"fmt"
+	"io"
 )
 
 var (
@@ -83,7 +83,6 @@ func (asm *Assembler) GenerateDebugSymbols(out io.Writer) (err error) {
 		}
 	}()
 
-
 	buf := new(bytes.Buffer)
 	writer := bufio.NewWriter(buf)
 
@@ -107,7 +106,7 @@ func (asm *Assembler) GenerateDebugSymbols(out io.Writer) (err error) {
 	// Write labels
 	for _, m := range asm.methods {
 		for _, l := range m.labels {
-			mustWrite(writer, m.B + l.B)
+			mustWrite(writer, m.B+l.B)
 			mustWrite(writer, []byte(fmt.Sprintf("%s#%s", m.name, l.Name)))
 			mustWrite(writer, uint8(0))
 		}

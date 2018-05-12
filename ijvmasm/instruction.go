@@ -38,7 +38,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 
 	instruction := NewInstruction(op, asm.line, method.bytes)
 	if method.wide {
-		log.Infof("[.%s] Operation widened", method.name, )
+		log.Infof("[.%s] Operation widened", method.name)
 		instruction.wide = true
 		method.wide = false
 	}

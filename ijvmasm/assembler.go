@@ -14,7 +14,10 @@ import (
 	"github.com/op/go-logging"
 )
 
-var log = logging.MustGetLogger("ijvmasm")
+var (
+	log               = logging.MustGetLogger("ijvmasm")
+	regexVariableName = regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9_-]*$")
+)
 
 // Assembler represents the main state of the assembler, housing all internal
 // information related to assembling a single IJVM program.
@@ -234,11 +237,7 @@ func (asm *Assembler) parseVars(method *Method) {
 			return
 		}
 
-		matched, err := regexp.MatchString("^[a-zA-Z][a-zA-Z0-9_-]*$", token.Text)
-		if err != nil {
-			asm.Errorf("Variable regex failure: %s", err.Error())
-			continue
-		}
+		matched := regexVariableName.MatchString(token.Text)
 
 		if !matched {
 			asm.Errorf("Invalid variable name `%s`", token.Text)
@@ -250,7 +249,6 @@ func (asm *Assembler) parseVars(method *Method) {
 	}
 
 	asm.Panicf("Unexpected end of file\n")
-	return // Unreachable anyway
 }
 
 // Read a single constant

@@ -23,6 +23,7 @@ before_script:
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)
+  - go build -v -race
   - go vet $GO_LIST
   - megacheck $GO_LIST
   - golint -set_exit_status $GO_LIST

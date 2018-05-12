@@ -1,6 +1,8 @@
 # goJASM
 The jazzy JAS compiler.
 
+[![Build Status](https://travis-ci.org/BlackNovaTech/goJASM.svg?branch=master)](https://travis-ci.org/BlackNovaTech/goJASM)
+
 ## Usage instructions
 
 Invoke the compiler using:
@@ -56,7 +58,7 @@ The following arguments types are available:
  - `label` (a label)
  - `constant` (name of a constant)
  - `method` (name of a method)
- 
+
 There can be any numer of arguments.
 However, there is a maximum of only one of either `label` or `constant` per operation.
 

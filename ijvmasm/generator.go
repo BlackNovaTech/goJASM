@@ -104,9 +104,14 @@ func (asm *Assembler) GenerateDebugSymbols(out io.Writer) (err error) {
 	writer = bufio.NewWriter(buf)
 
 	// Write labels
-	for _, m := range asm.methods {
+	for i, m := range asm.methods {
 		for _, l := range m.labels {
-			mustWrite(writer, m.B+l.B)
+			if i == 0 {
+				mustWrite(writer, m.B+l.B)
+			} else {
+				mustWrite(writer, m.B+l.B+4) // take the method header into account
+			}
+
 			mustWrite(writer, []byte(fmt.Sprintf("%s#%s", m.name, l.Name)))
 			mustWrite(writer, uint8(0))
 		}

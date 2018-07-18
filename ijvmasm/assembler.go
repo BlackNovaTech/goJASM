@@ -366,7 +366,7 @@ func (asm *Assembler) linkMethods() (ok bool) {
 		asm.constants = append(asm.constants, mconst)
 		method.B = asm.bytes
 		log.Infof("Method #%d line %d placed at %d", i, method.N, asm.bytes)
-		asm.bytes += method.bytes + 4
+		asm.bytes += method.bytes
 	}
 
 	for _, method := range asm.methods {

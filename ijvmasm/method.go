@@ -36,6 +36,7 @@ type Label struct {
 // NewMethod returns a new Method based on the given method declaration and line number.
 // Parameters are parsed from the string and added to the parameter list.
 func NewMethod(nameParam string, N uint32) (*Method, error) {
+	var startbyte uint32
 	end := JASMethodEnd
 	params := []string{}
 	name := "main"
@@ -66,6 +67,8 @@ func NewMethod(nameParam string, N uint32) (*Method, error) {
 		for i, p := range paramlst {
 			params[i+1] = strings.TrimSpace(p)
 		}
+
+		startbyte = 4
 	}
 
 	return &Method{
@@ -76,6 +79,8 @@ func NewMethod(nameParam string, N uint32) (*Method, error) {
 		labels:       make([]*Label, 0),
 		end:          end,
 		N:            N,
+		bytes:        startbyte,
+		B:            startbyte,
 	}, nil
 
 }

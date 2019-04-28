@@ -2,10 +2,11 @@ package ijvmasm
 
 import (
 	"errors"
+	"github.com/sirupsen/logrus"
 	"io"
 	"strings"
 
-	"github.com/BlackNovaTech/goJASM/opconf"
+	"github.com/BlackNovaTech/gojasm/opconf"
 )
 
 // Method represents a single IJVM method context
@@ -38,22 +39,22 @@ type Label struct {
 func NewMethod(nameParam string, N uint32) (*Method, error) {
 	var startbyte uint32
 	end := JASMethodEnd
-	params := []string{}
+	var params []string
 	name := "main"
 	if nameParam == "main" {
 		end = JASMainEnd
 	} else {
 		if !strings.ContainsRune(nameParam, '(') {
-			return nil, errors.New("Invalid method declaration. Missing opening parenthesis")
+			return nil, errors.New("invalid method declaration. Missing opening parenthesis")
 		}
 		rawName, paramstr := splitLink(nameParam, "(")
 		name = strings.TrimSpace(rawName)
 		if !strings.ContainsRune(paramstr, ')') {
-			return nil, errors.New("Invalid method declaration. Missing closing parenthesis")
+			return nil, errors.New("invalid method declaration. Missing closing parenthesis")
 		}
 		paramstr, junk := splitLink(paramstr, ")")
 		if strings.TrimSpace(junk) != "" {
-			return nil, errors.New("Invalid method declaration. Characters remaining after parameter list")
+			return nil, errors.New("invalid method declaration. Characters remaining after parameter list")
 		}
 
 		paramlst := strings.Split(paramstr, ",")
@@ -123,11 +124,11 @@ func (m *Method) LinkLabels() (ok bool) {
 			if argType == opconf.ArgLabel {
 				found, _, lbl := m.findLabel(inst.label)
 				if !found {
-					log.Errorf("[.%s] Undefined label `%s` at line %d", m.name, inst.label, inst.N)
+					logrus.Errorf("[.%s] Undefined label `%s` at line %d", m.name, inst.label, inst.N)
 					ok = false
 				}
 				inst.params[j] = int(lbl.B) - int(inst.B)
-				log.Debugf("[.%s] Linking label, line %d: @%d -> %s@%d, offset = %d",
+				logrus.Debugf("[.%s] Linking label, line %d: @%d -> %s@%d, offset = %d",
 					m.name, inst.N, inst.B, lbl.Name, lbl.B, inst.params[j])
 			}
 		}
@@ -147,11 +148,11 @@ func (m *Method) LinkMethods(asm *Assembler) (ok bool) {
 			if argType == opconf.ArgMethod {
 				found, idx, mtd := asm.findConstant(inst.label)
 				if !found {
-					log.Errorf("[.%s] Undefined method `%s` at line %d", m.name, inst.label, inst.N)
+					logrus.Errorf("[.%s] Undefined method `%s` at line %d", m.name, inst.label, inst.N)
 					ok = false
 				}
 				inst.params[j] = idx
-				log.Debugf("[.%s] Linking method, line %d: %s -> %d",
+				logrus.Debugf("[.%s] Linking method, line %d: %s -> %d",
 					m.name, inst.N, mtd.Name, inst.params[j])
 			}
 		}

@@ -6,13 +6,12 @@ import (
 
 	"fmt"
 
-	"github.com/BlackNovaTech/goJASM/ijvmasm"
-	"github.com/BlackNovaTech/goJASM/opconf"
-	"github.com/op/go-logging"
+	"github.com/BlackNovaTech/gojasm/ijvmasm"
+	"github.com/BlackNovaTech/gojasm/opconf"
+	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 )
 
-var log *logging.Logger
 var (
 	flagInfo     bool
 	flagDebug    bool
@@ -26,15 +25,15 @@ var (
 
 // Linker Variables
 var (
-	Version   string
-	BuildDate string
+	Version   = "DEVELOPMENT"
+	BuildDate = "<dev>"
 )
 
 func init() {
 	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging")
 	flag.BoolVarP(&flagDebug, "debug", "d", false, "enable debug message logging")
 	flag.StringVarP(&flagConfig, "config", "c", "", "specify custom ijvm configuration file")
-	flag.StringVarP(&flagOutput, "output", "o", "", "specify output file. (default out.ijvm)")
+	flag.StringVarP(&flagOutput, "output", "o", "out.ijvm", "specify output file. (default out.ijvm)")
 	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through")
 	flag.BoolVarP(&flagAutoWide, "widen", "w", false, "automatically add WIDE operations when required")
 	flag.BoolVarP(&flagSymbols, "symbols", "s", false, "generate symbol blocks")
@@ -52,24 +51,19 @@ func init() {
 		os.Exit(0)
 	}
 
-	log = logging.MustGetLogger("main")
-	format := logging.MustStringFormatter(`%{module:10.10s} [%{color}%{level:.4s}%{color:reset}] %{message}`)
-	logging.SetFormatter(format)
-	logging.SetBackend(logging.NewLogBackend(os.Stderr, "", 0))
 	if flagDebug {
-		logging.SetLevel(logging.DEBUG, "")
+		logrus.SetLevel(logrus.DebugLevel)
 	} else if flagInfo {
-		logging.SetLevel(logging.INFO, "")
+		logrus.SetLevel(logrus.InfoLevel)
 	} else {
-		logging.SetLevel(logging.NOTICE, "")
+		logrus.SetLevel(logrus.WarnLevel)
 	}
 }
 
 func main() {
 	args := flag.Args()
 	if len(args) == 0 {
-		log.Critical("Please specify a file to compile")
-		os.Exit(1)
+		logrus.Fatal("Please specify a file to compile")
 	}
 
 	var config *opconf.OpConfig
@@ -81,50 +75,42 @@ func main() {
 
 	input := args[0]
 	output := flagOutput
-	if output == "" {
-		output = "out.ijvm"
-	}
 
 	asm := ijvmasm.NewAssembler(input, config)
 	asm.AutoWide = flagAutoWide
 	ok, err := asm.Parse()
 
 	if err != nil && !flagForce {
-		log.Critical("Assembly prematurely aborted:")
-		log.Critical(err.Error())
-		os.Exit(1)
+		logrus.WithError(err).Fatal("Assembly prematurely aborted:")
 	}
 
 	if !ok && !flagForce {
-		log.Critical("Assembly failed")
-		os.Exit(1)
+		logrus.Fatalln("Assembly failed")
 	}
 
 	var out io.Writer = os.Stdout
 	if output != "-" {
 		outf, err := os.Create(output)
 		if err != nil {
-			log.Critical("Could not open outputFile file:")
-			log.Critical(err.Error())
-			os.Exit(1)
+			logrus.WithError(err).Fatal("Could not open output file")
 		}
 		defer outf.Close()
 		out = outf
 	}
 
 	if err = asm.Generate(out); err != nil {
-		log.Error(err.Error())
+		logrus.WithError(err).Error("Error generating bytecode")
 	}
 
 	if flagSymbols {
-		log.Info("Generating Symbols...")
+		logrus.Info("Generating Symbols...")
 		if err = asm.GenerateDebugSymbols(out); err != nil {
-			log.Error(err.Error())
+			logrus.WithError(err).Error("Error generating symbols")
 		}
 	}
 }
 
 func printVersion() {
-	fmt.Printf("goJASM version %s\n", Version)
+	fmt.Printf("gojasm version %s\n", Version)
 	fmt.Printf("Built at: %s\n", BuildDate)
 }

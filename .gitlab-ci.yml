@@ -5,13 +5,6 @@ stages:
   - build
   - deploy
 
-before_script:
-  - mkdir -p $GOPATH/src/git.practool.xyz/nova
-  - ln -s $(pwd) $GOPATH/src/git.practool.xyz/nova/goJASM
-  - cd $GOPATH/src/git.practool.xyz/nova/goJASM
-  - go get github.com/Masterminds/glide
-  - glide install
-
 lint:
   stage: lint
   script:
@@ -21,20 +14,8 @@ lint:
 binaries:
   stage: build
   script:
-  - go get github.com/mitchellh/gox
-  - make cross
+    - go get github.com/mitchellh/gox
+    - make cross
   artifacts:
     paths:
-    - out/
-
-deploy:
-  stage: deploy
-  only:
-   - tags
-  before_script:
-    - eval $(ssh-agent -s)
-    - ssh-add <(echo "$DEPLOY_KEY")
-    - mkdir -p ~/.ssh
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  script:
-    - scp -Br out/ deploy@phoenix.labs.vu.nl:files/gojasm/
+      - out/

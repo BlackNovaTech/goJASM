@@ -20,5 +20,5 @@
 *.jas
 vendor/
 *.conf
-goJASM
+gojasm
 gojasm

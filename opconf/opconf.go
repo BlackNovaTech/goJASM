@@ -8,11 +8,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/BlackNovaTech/goJASM/parsers"
-	"github.com/op/go-logging"
+	"github.com/BlackNovaTech/gojasm/parsers"
+	"github.com/sirupsen/logrus"
 )
-
-var log = logging.MustGetLogger("opconf")
 
 // ArgType represents the type of an argument
 type ArgType int8
@@ -53,7 +51,7 @@ type Operation struct {
 func NewOpConfigFromPath(filepath string) *OpConfig {
 	file, err := os.Open(filepath)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	config := NewOpConfig(file, path.Base(filepath))
@@ -80,7 +78,7 @@ func NewOpConfig(read io.Reader, name string) *OpConfig {
 
 	config.parse()
 	if config.failed {
-		log.Fatal("OpConf parse failed")
+		logrus.Fatal("OpConf parse failed")
 	}
 
 	return config
@@ -98,7 +96,7 @@ func (cfg *OpConfig) GetOp(opname string) *Operation {
 func (cfg *OpConfig) parse() {
 	ophash := make(map[uint8]bool)
 	for tokens := cfg.next(); tokens != nil; tokens = cfg.next() {
-		log.Debug(cfg.Sprintf(strings.Join(tokens, " ")))
+		logrus.Debug(cfg.Sprintf(strings.Join(tokens, " ")))
 
 		if len(tokens) == 0 {
 			continue
@@ -144,7 +142,7 @@ func (cfg *OpConfig) parse() {
 
 		ophash[opcode] = true
 		cfg.operations[opname] = op
-		log.Infof("Operation registered: %2X -> %s (%d)", op.Opcode, op.Name, len(op.Args))
+		logrus.Debugf("Operation registered: %2X -> %s (%d)", op.Opcode, op.Name, len(op.Args))
 	}
 }
 
@@ -186,6 +184,6 @@ func (cfg *OpConfig) Sprintf(format string, args ...interface{}) string {
 // using OpConfig#Sprintf
 func (cfg *OpConfig) Errorf(format string, args ...interface{}) {
 	cfg.failed = true
-	log.Errorf(cfg.Sprintf(format, args...))
+	logrus.Error(cfg.Sprintf(format, args...))
 
 }

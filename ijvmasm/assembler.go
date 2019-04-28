@@ -9,13 +9,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/BlackNovaTech/goJASM/opconf"
-	"github.com/BlackNovaTech/goJASM/parsers"
-	"github.com/op/go-logging"
+	"github.com/BlackNovaTech/gojasm/opconf"
+	"github.com/BlackNovaTech/gojasm/parsers"
+	"github.com/sirupsen/logrus"
 )
 
 var (
-	log               = logging.MustGetLogger("ijvmasm")
 	regexVariableName = regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9_-]*$")
 )
 
@@ -47,7 +46,7 @@ type Assembler struct {
 func NewAssembler(filepath string, ops *opconf.OpConfig) *Assembler {
 	file, err := os.Open(filepath)
 	if err != nil {
-		log.Fatal(err)
+		logrus.WithError(err).Fatal("Could not open file")
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -97,7 +96,7 @@ func (asm *Assembler) Parse() (ok bool, err error) {
 		ok = !asm.failed
 	}()
 	for token := asm.next(); token != nil; token = asm.next() {
-		log.Debug(asm.Sprintf(token.Text))
+		logrus.Debug(asm.Sprintf(token.Text))
 
 		switch token.Text {
 		case JASConstantStart:
@@ -143,8 +142,6 @@ func (asm *Assembler) constantBlock() {
 			return
 		}
 
-		log.Debug(asm.Sprintf(token.Text))
-
 		if token.Text == "" {
 			continue
 		}
@@ -152,7 +149,7 @@ func (asm *Assembler) constantBlock() {
 		constant := asm.readConstant(token)
 		if constant != nil {
 			asm.constants = append(asm.constants, constant)
-			log.Infof("Constant registered: %s = %d", constant.Name, constant.Value)
+			logrus.Debugf("Constant registered: %s = %d", constant.Name, constant.Value)
 		}
 
 	}
@@ -172,7 +169,7 @@ func (asm *Assembler) mainBlock() {
 
 // Parses a method block
 func (asm *Assembler) methodBlock(name string) {
-	log.Infof("[.%s] Entering method", name)
+	logrus.Debugf("[.%s] Entering method", name)
 	method, err := NewMethod(name, asm.line)
 	if err != nil {
 		panic(err)
@@ -181,12 +178,11 @@ func (asm *Assembler) methodBlock(name string) {
 
 	// Instruction parsing
 	for token := asm.next(); token != nil; token = asm.next() {
-		log.Debug(asm.Sprintf(token.Text))
 		switch token.Text {
 		case method.end:
 			method.LinkLabels()
 			asm.methods = append(asm.methods, method)
-			log.Infof("Registered method: (%d) %s", len(asm.methods)-1, name)
+			logrus.Infof("Registered method: (%d) %s", len(asm.methods)-1, name)
 			return
 		case "":
 			continue
@@ -218,7 +214,7 @@ func (asm *Assembler) methodBlock(name string) {
 				method.bytes,
 			}
 			method.labels = append(method.labels, label)
-			log.Infof("[.%s] Registered label: %s@%d", method.name, label.Name, label.B)
+			logrus.Infof("[.%s] Registered label: %s@%d", method.name, label.Name, label.B)
 		}
 
 		if instr != "" {
@@ -231,8 +227,6 @@ func (asm *Assembler) methodBlock(name string) {
 // Parses a var block
 func (asm *Assembler) parseVars(method *Method) {
 	for token := asm.next(); token != nil; token = asm.next() {
-		log.Debug(asm.Sprintf(token.Text))
-
 		if token.Text == JASVarEnd {
 			return
 		}
@@ -245,7 +239,7 @@ func (asm *Assembler) parseVars(method *Method) {
 		}
 
 		method.vars = append(method.vars, token.Text)
-		log.Infof("[.%s] Registered variable: %s", method.name, token.Text)
+		logrus.Infof("[.%s] Registered variable: %s", method.name, token.Text)
 	}
 
 	asm.Panicf("Unexpected end of file\n")
@@ -321,7 +315,7 @@ func (asm *Assembler) Sprintf(format string, args ...interface{}) string {
 // using Assembler#Sprintf
 func (asm *Assembler) Errorf(format string, args ...interface{}) {
 	asm.failed = true
-	log.Errorf(asm.Sprintf(format, args...))
+	logrus.Errorf(asm.Sprintf(format, args...))
 }
 
 // Panicf sets the failed flag of the assembler, and panics an error
@@ -334,7 +328,7 @@ func (asm *Assembler) Panicf(format string, args ...interface{}) {
 // Skips lines until given string
 func (asm *Assembler) skipUntil(pattern string) {
 	for token := asm.next(); token != nil; token = asm.next() {
-		log.Warning(asm.Sprintf("|skip| %s", token.Text))
+		logrus.Warning(asm.Sprintf("|skip| %s", token.Text))
 		if token.Text == pattern {
 			return
 		}
@@ -365,7 +359,7 @@ func (asm *Assembler) linkMethods() (ok bool) {
 
 		asm.constants = append(asm.constants, mconst)
 		method.B = asm.bytes
-		log.Infof("Method #%d line %d placed at %d", i, method.N, asm.bytes)
+		logrus.Infof("Method #%d line %d placed at %d", i, method.N, asm.bytes)
 		asm.bytes += method.bytes
 	}
 

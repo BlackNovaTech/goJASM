@@ -1,10 +1,11 @@
 package ijvmasm
 
 import (
+	"github.com/sirupsen/logrus"
 	"strings"
 
-	"github.com/BlackNovaTech/goJASM/opconf"
-	"github.com/BlackNovaTech/goJASM/parsers"
+	"github.com/BlackNovaTech/gojasm/opconf"
+	"github.com/BlackNovaTech/gojasm/parsers"
 )
 
 // Instruction is a single instruction in the instruction stream.
@@ -38,14 +39,14 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 
 	instruction := NewInstruction(op, asm.line, method.bytes)
 	if method.wide {
-		log.Infof("[.%s] Operation widened", method.name)
+		logrus.Debugf("[.%s] Operation widened", method.name)
 		instruction.wide = true
 		method.wide = false
 	}
 	var bytes uint32 = 1
 
 	for i, token := range params {
-		log.Debugf("arg %d -> %s", i, token)
+		logrus.Debugf("arg %d -> %s", i, token)
 		switch op.Args[i] {
 		case opconf.ArgByte:
 			var val int8
@@ -77,7 +78,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 					bytes++
 					instruction.B++
 					instruction.wide = true
-					log.Infof("[.%s] Auto widened instruction", method.name)
+					logrus.Debugf("[.%s] Auto widened instruction", method.name)
 				} else {
 					asm.Errorf("argument: Variable index out of range: `%s` (%d > %d)", token, idx, 0xFF)
 					return
@@ -106,7 +107,7 @@ func (asm *Assembler) parseInstruction(method *Method, instr string) {
 
 	method.AppendInst(instruction)
 	method.bytes += bytes
-	log.Infof("[.%s] Registered instruction: %s (%d)", method.name, instruction.op.Name, len(instruction.params))
+	logrus.Debugf("[.%s] Registered instruction: %s (%d)", method.name, instruction.op.Name, len(instruction.params))
 
 	if instruction.op.Name == OperationWide {
 		method.wide = true

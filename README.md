@@ -1,7 +1,7 @@
-# goJASM
+# gojasm
 The jazzy JAS compiler.
 
-[![Build Status](https://travis-ci.org/BlackNovaTech/goJASM.svg?branch=master)](https://travis-ci.org/BlackNovaTech/goJASM)
+[![Build Status](https://travis-ci.org/BlackNovaTec\textsl{}h/gojasm.svg?branch=master)](https://travis-ci.org/BlackNovaTech/gojasm)
 
 ## Usage instructions
 

@@ -16,7 +16,6 @@ notifications:
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
   - GO_LIST=$(go list ./...)
-  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
   - go get github.com/golang/lint/golint
   - go get honnef.co/go/tools/cmd/megacheck
   - dep ensure

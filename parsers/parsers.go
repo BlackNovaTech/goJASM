@@ -10,11 +10,11 @@ func parseInt(strval string, bitlen int) (int64, error) {
 	bigval, ok := big.NewInt(-1).SetString(strval, 0)
 
 	if !ok {
-		return 0, fmt.Errorf("Invalid value: `%s`", strval)
+		return 0, fmt.Errorf("invalid value: `%s`", strval)
 	}
 
 	if bigval.BitLen() > bitlen {
-		return 0, fmt.Errorf("Value out of range: `%s`", strval)
+		return 0, fmt.Errorf("value out of range: `%s`", strval)
 	}
 
 	return bigval.Int64(), nil
@@ -60,15 +60,15 @@ func parseUint(strval string, bitlen int) (uint64, error) {
 	bigval, ok := big.NewInt(-1).SetString(strval, 0)
 
 	if !ok {
-		return 0, fmt.Errorf("Invalid value: `%s`", strval)
+		return 0, fmt.Errorf("invalid value: `%s`", strval)
 	}
 
 	if bigval.BitLen() > bitlen {
-		return 0, fmt.Errorf("Value out of range: `%s`", strval)
+		return 0, fmt.Errorf("value out of range: `%s`", strval)
 	}
 
 	if bigval.Sign() < 0 {
-		return 0, fmt.Errorf("Value cannot be negative: `%s`", strval)
+		return 0, fmt.Errorf("value cannot be negative: `%s`", strval)
 	}
 
 	return bigval.Uint64(), nil
@@ -114,9 +114,9 @@ func ParseUint64(strval string) (uint64, error) {
 func ParseChar(strval string) (int8, error) {
 	if strings.HasPrefix(strval, "'") {
 		if !strings.HasSuffix(strval, "'") || len(strval) != 3 {
-			return 0, fmt.Errorf("Invalid character literal `%s`", strval)
+			return 0, fmt.Errorf("invalid character literal `%s`", strval)
 		}
 		return int8(strval[1]), nil
 	}
-	return 0, fmt.Errorf("Invalid character literal `%s`", strval)
+	return 0, fmt.Errorf("invalid character literal `%s`", strval)
 }

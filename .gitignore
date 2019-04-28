@@ -21,3 +21,4 @@
 vendor/
 *.conf
 goJASM
+gojasm

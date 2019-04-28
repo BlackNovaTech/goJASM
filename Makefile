@@ -1,7 +1,7 @@
 VERSION=`git describe --tags`
 BUILD_DATE=`date +%FT%T%z`
 
-BINARY=goJASM
+BINARY=gojasm
 LDFLAGS="-X main.Version=${VERSION} -X main.BuildDate=${BUILD_DATE}"
 
 TARGETS="linux/386 linux/amd64 linux/arm darwin/amd64 windows/amd64"

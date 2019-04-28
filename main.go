@@ -33,7 +33,7 @@ func init() {
 	flag.BoolVarP(&flagInfo, "info", "i", false, "enable info message logging")
 	flag.BoolVarP(&flagDebug, "debug", "d", false, "enable debug message logging")
 	flag.StringVarP(&flagConfig, "config", "c", "", "specify custom ijvm configuration file")
-	flag.StringVarP(&flagOutput, "output", "o", "out.ijvm", "specify output file. (default out.ijvm)")
+	flag.StringVarP(&flagOutput, "output", "o", "out.ijvm", "specify output file.")
 	flag.BoolVarP(&flagForce, "force", "f", false, "ignore most error messages and just yolo through")
 	flag.BoolVarP(&flagAutoWide, "widen", "w", false, "automatically add WIDE operations when required")
 	flag.BoolVarP(&flagSymbols, "symbols", "s", false, "generate symbol blocks")
@@ -42,6 +42,7 @@ func init() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s inputfile\n", os.Args[0])
 		flag.PrintDefaults()
+		os.Exit(0)
 	}
 
 	flag.Parse()

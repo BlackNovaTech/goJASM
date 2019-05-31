@@ -217,7 +217,9 @@ func (asm *Assembler) methodBlock(name string) {
 			logrus.Infof("[.%s] Registered label: %s@%d", method.name, label.Name, label.B)
 		}
 
-		if instr != "" {
+		if strings.HasPrefix(instr, "#") {
+			asm.executeMacro(method, instr)
+		} else if instr != "" {
 			asm.parseInstruction(method, instr)
 		}
 	}

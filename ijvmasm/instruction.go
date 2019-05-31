@@ -1,8 +1,9 @@
 package ijvmasm
 
 import (
-	"github.com/sirupsen/logrus"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/BlackNovaTech/gojasm/opconf"
 	"github.com/BlackNovaTech/gojasm/parsers"

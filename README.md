@@ -15,6 +15,15 @@ To see the selection of useful (and useless) flags use:
 $ gojasm --help
 ```
 
+## IJVM extensions
+
+gojasm has a few extensions on the JAS language specification, just for ease of use:
+
+- **numbers**: gojasm allows you to define numbers using either normal (10), 
+hex (0x10), octal (012), and binary (0b1010), instead of only the normal form
+- **#print macro**: gojasm has a macro, `#print "text to print"` which will be
+converted to the corresponding BIPUSH and OUT instructions.
+
 ## Custom IJVM configuration
 
 By default we load the equivalent to the Mic-1 default configuration file,

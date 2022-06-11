@@ -1,7 +1,7 @@
 # gojasm
 The jazzy JAS compiler.
 
-[![Build Status](https://travis-ci.org/BlackNovaTec\textsl{}h/gojasm.svg?branch=master)](https://travis-ci.org/BlackNovaTech/gojasm)
+[![Release goJASM binaries](https://github.com/BlackNovaTech/goJASM/actions/workflows/release.yml/badge.svg)](https://github.com/BlackNovaTech/goJASM/actions/workflows/release.yml)
 
 ## Usage instructions
 

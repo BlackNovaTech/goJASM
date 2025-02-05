@@ -4,7 +4,7 @@ BUILD_DATE=`date +%FT%T%z`
 BINARY=gojasm
 LDFLAGS="-X main.Version=${VERSION} -X main.BuildDate=${BUILD_DATE}"
 
-TARGETS="linux/386 linux/amd64 linux/arm darwin/amd64 windows/amd64"
+TARGETS="linux/386 linux/amd64 linux/arm darwin/amd64 darwin/arm64 windows/amd64"
 CROSS_OUT="out/gojasm-{{.OS}}-{{.Arch}}"
 
 .PHONY: clean
